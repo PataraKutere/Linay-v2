@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Linay · Fal ve Burç</title>
+<style>
+:root{--bg:#f6f1fb;--card:#fff;--ink:#2a1f3d;--mut:#6d6280;--acc:#7b4bd1;--acc2:#c58a2b;--line:#e2d8f0;--err:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#150f24;--card:#201736;--ink:#efe8fb;--mut:#a99bc4;--acc:#a98af0;--acc2:#e3b660;--line:#35294f;--err:#ff8a80;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:2rem;margin:8px 0 0;letter-spacing:.08em;color:var(--acc)}
+.sub{color:var(--mut);margin:0 0 14px}
+nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:999px;font:inherit;cursor:pointer}
+nav button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+section{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:10px}
+section.on{display:block}
+label{display:block;margin:10px 0 4px;color:var(--mut);font-size:.9rem}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.go{margin-top:12px;background:var(--acc2);color:#1b1305;border:0;padding:11px 18px;border-radius:12px;font:inherit;font-weight:bold;cursor:pointer}
+.go:disabled{opacity:.5}
+.out{white-space:pre-wrap;margin-top:14px}
+.err{color:var(--err);margin-top:10px;white-space:pre-wrap}
+.note{font-size:.82rem;color:var(--mut);margin-top:12px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumbs img{width:92px;height:92px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.cards{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.tc{flex:1 1 150px;border:1px solid var(--acc2);border-radius:12px;padding:12px;text-align:center}
+.tc small{display:block;color:var(--mut)}
+.tc b{display:block;font-size:1.05rem;margin-top:4px}
+.tc.rev b{transform:rotate(180deg)}
+</style>
+</head>
+<body>
+<main>
+<h1>LİNAY ✦</h1>
+<p class="sub">Kahve, el, tarot, doğum haritası ve günlük burç</p>
+<nav id="nav"></nav>
+
+<section id="burc">
+<label for="bsign">Burcun</label><select id="bsign"></select>
+<button class="go" id="bgo">Bugünün yorumunu getir</button>
+<div class="out" id="bout"></div>
+</section>
+
+<section id="tarot">
+<label for="tq">Sorun (isteğe bağlı)</label><input id="tq" placeholder="Örn. işimde önümüzdeki dönem nasıl?">
+<button class="go" id="tgo">3 kart çek</button>
+<div class="cards" id="tcards"></div>
+<div class="out" id="tout"></div>
+</section>
+
+<section id="kahve">
+<p>Fincanın içini, tabağını ve yan görünümünü çek (en fazla 3 fotoğraf). Linay önce görüntülerin gerçekten telve izi olan bir kahve fincanı olup olmadığını kontrol eder.</p>
+<input type="file" id="kfile" accept="image/*" multiple>
+<div class="thumbs" id="kthumbs"></div>
+<label for="kq">Niyetin (isteğe bağlı)</label><input id="kq" placeholder="Örn. aşk, iş, genel">
+<button class="go" id="kgo">Falıma bak</button>
+<div class="err" id="kerr"></div><div class="out" id="kout"></div>
+</section>
+
+<section id="el">
+<p>Avuç içini açık, iyi aydınlatılmış ve çizgiler net görünecek şekilde çek (1–2 fotoğraf). Linay önce görüntünün gerçekten bir avuç içi olup olmadığını kontrol eder.</p>
+<input type="file" id="efile" accept="image/*" multiple>
+<div class="thumbs" id="ethumbs"></div>
+<button class="go" id="ego">Elime bak</button>
+<div class="err" id="eerr"></div><div class="out" id="eout"></div>
+</section>
+
+<section id="harita">
+<label for="hd">Doğum tarihi</label><input type="date" id="hd">
+<label for="ht">Doğum saati (bilmiyorsan boş bırak)</label><input type="time" id="ht">
+<label for="hc">Doğum yeri (şehir, ülke)</label><input id="hc" placeholder="İstanbul, Türkiye">
+<button class="go" id="hgo">Haritamı çıkar</button>
+<div class="out" id="hout"></div>
+<p class="note">Güneş burcu tarihten kesin hesaplanır. Ay, yükselen ve evler yapay zekâ tahminidir.</p>
+</section>
+
+<p class="note">Linay eğlence ve kişisel farkındalık amaçlıdır; sağlık, hukuk ve para kararlarında yerine geçmez. Yüklediğin fotoğraflar yorum için yapay zekâ servisine gönderilir, Linay bunları saklamaz.</p>
+</main>
+<script>
+const WORKER_URL="https://linay-api.KULLANICI-ADIN.workers.dev"; // Cloudflare Worker adresin
+const SIGNS=[["Koç","03-21"],["Boğa","04-20"],["İkizler","05-21"],["Yengeç","06-22"],["Aslan","07-23"],["Başak","08-23"],["Terazi","09-23"],["Akrep","10-23"],["Yay","11-22"],["Oğlak","12-22"],["Kova","01-20"],["Balık","02-19"]];
+const TAROT=["Deli","Büyücü","Başrahibe","İmparatoriçe","İmparator","Aziz","Âşıklar","Savaş Arabası","Güç","Ermiş","Kader Çarkı","Adalet","Asılan Adam","Ölüm","Denge","Şeytan","Kule","Yıldız","Ay","Güneş","Mahkeme","Dünya"];
+const $=id=>document.getElementById(id);
+const TABS=[["burc","Günlük burç"],["tarot","Tarot"],["kahve","Kahve falı"],["el","El falı"],["harita","Doğum haritası"]];
+TABS.forEach(([id,t])=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>show(id);b.dataset.id=id;$("nav").appendChild(b)});
+function show(id){TABS.forEach(([i])=>$(i).classList.toggle("on",i===id));[...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.id===id));try{history.replaceState(null,"","#"+id)}catch(e){}}
+show(TABS.some(t=>"#"+t[0]===location.hash)?location.hash.slice(1):"burc");
+SIGNS.forEach(([n])=>{const o=document.createElement("option");o.textContent=n;$("bsign").appendChild(o)});
+function sunSign(d){const k=("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);let best=null;SIGNS.forEach(([n,v])=>{if(v<=k&&(!best||v>best[1]))best=[n,v]});return best?best[0]:"Oğlak"}
+
+const BUSY="Şu an yorum yapılamıyor (günlük ücretsiz kota dolmuş olabilir). Biraz sonra tekrar dene.";
+async function call(body){const r=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("http "+r.status);return r.json()}
+function busy(btn,f){return async()=>{btn.disabled=true;try{await f()}finally{btn.disabled=false}}}
+async function ask(out,body){out.textContent="Linay yorumluyor…";try{const r=await call(body);out.textContent=r.text||BUSY;return r.text}catch(e){out.textContent=BUSY;return null}}
+
+$("bgo").onclick=busy($("bgo"),async()=>{const sg=$("bsign").value,key="linay:"+new Date().toISOString().slice(0,10)+":"+sg;
+ try{const c=localStorage.getItem(key);if(c){$("bout").textContent=c;return}}catch(e){}
+ const t=await ask($("bout"),{mode:"text",task:"burc",sign:sg});if(t){try{localStorage.setItem(key,t)}catch(e){}}});
+
+$("tgo").onclick=busy($("tgo"),async()=>{const pool=[...TAROT.keys()].sort(()=>Math.random()-.5).slice(0,3),pos=["Geçmiş","Şimdi","Gelecek"];
+ const cs=pool.map((i,k)=>({n:TAROT[i],r:Math.random()<.3,p:pos[k]}));$("tcards").innerHTML="";
+ cs.forEach(c=>{const d=document.createElement("div");d.className="tc"+(c.r?" rev":"");const a=document.createElement("small");a.textContent=c.p+(c.r?" · ters":"");const b=document.createElement("b");b.textContent=c.n;d.append(a,b);$("tcards").appendChild(d)});
+ await ask($("tout"),{mode:"text",task:"tarot",cards:cs,q:$("tq").value.trim()})});
+
+const photos={kahve:[],el:[]};
+async function shrink(f){const bm=await createImageBitmap(f);const sc=Math.min(1,768/Math.max(bm.width,bm.height));const c=document.createElement("canvas");c.width=Math.round(bm.width*sc);c.height=Math.round(bm.height*sc);c.getContext("2d").drawImage(bm,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,"image/jpeg",.8))}
+const toUrl=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+function wire(kind,fileId,thumbId,errId){$(fileId).onchange=async e=>{$(errId).textContent="";photos[kind]=[];$(thumbId).innerHTML="";
+ for(const f of [...e.target.files].slice(0,3)){try{const b=await shrink(f);photos[kind].push(b);const im=document.createElement("img");im.src=URL.createObjectURL(b);$(thumbId).appendChild(im)}catch(x){$(errId).textContent="Bir fotoğraf okunamadı, başka bir tane dene."}}}}
+wire("kahve","kfile","kthumbs","kerr");wire("el","efile","ethumbs","eerr");
+function photoFlow(kind,btn,errId,outId,note){btn.onclick=busy(btn,async()=>{$(errId).textContent="";$(outId).textContent="";
+ if(!photos[kind].length){$(errId).textContent="Önce en az bir fotoğraf ekle.";return}
+ $(outId).textContent="Fotoğraflar inceleniyor…";
+ try{const images=await Promise.all(photos[kind].map(toUrl));const r=await call({mode:"vision",kind,images,note:note()});
+  if(!r.ok){$(outId).textContent="";$(errId).textContent=r.reasons.join("\n")+"\nLütfen uygun fotoğraflarla tekrar dene.";return}
+  $(outId).textContent=r.text}
+ catch(e){$(outId).textContent="";$(errId).textContent=BUSY}})}
+photoFlow("kahve",$("kgo"),"kerr","kout",()=>$("kq").value.trim());
+photoFlow("el",$("ego"),"eerr","eout",()=>"");
+
+$("hgo").onclick=busy($("hgo"),async()=>{const d=$("hd").value;if(!d){$("hout").textContent="Doğum tarihini seç.";return}
+ await ask($("hout"),{mode:"text",task:"harita",date:d,time:$("ht").value,city:$("hc").value.trim(),sun:sunSign(new Date(d+"T12:00:00"))})});
+</script>
+</body>
+</html>
