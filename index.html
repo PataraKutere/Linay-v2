@@ -93,9 +93,9 @@ SIGNS.forEach(([n])=>{const o=document.createElement("option");o.textContent=n;$
 function sunSign(d){const k=("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);let best=null;SIGNS.forEach(([n,v])=>{if(v<=k&&(!best||v>best[1]))best=[n,v]});return best?best[0]:"Oğlak"}
 
 const BUSY="Şu an yorum yapılamıyor (günlük ücretsiz kota dolmuş olabilir). Biraz sonra tekrar dene.";
-async function call(body){const r=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("http "+r.status);return r.json()}
+async function call(body){const r=await fetch(WORKER_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok){let t="";try{t=JSON.stringify(await r.json())}catch(e){}throw new Error("http "+r.status+" "+t)}return r.json()}
 function busy(btn,f){return async()=>{btn.disabled=true;try{await f()}finally{btn.disabled=false}}}
-async function ask(out,body){out.textContent="Linay yorumluyor…";try{const r=await call(body);out.textContent=r.text||BUSY;return r.text}catch(e){out.textContent=BUSY;return null}}
+async function ask(out,body){out.textContent="Linay yorumluyor…";try{const r=await call(body);out.textContent=r.text||BUSY;return r.text}catch(e){out.textContent=BUSY+"\n\nTeknik ayrıntı: "+e.message;return null}}
 
 $("bgo").onclick=busy($("bgo"),async()=>{const sg=$("bsign").value,key="linay:"+new Date().toISOString().slice(0,10)+":"+sg;
  try{const c=localStorage.getItem(key);if(c){$("bout").textContent=c;return}}catch(e){}
